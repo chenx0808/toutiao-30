@@ -1,6 +1,11 @@
 <template>
   <div class="login-container">
-    <van-nav-bar title="登录" />
+    <van-nav-bar title="登录">
+      <template #left>
+        <van-icon name="cross" color="#fff" @click="tiaozhuan" />
+      </template>
+    </van-nav-bar>
+
     <van-form @submit="onSubmit" ref="form">
       <van-field
         v-model="user.mobile"
@@ -103,9 +108,11 @@ export default {
       try {
         const res = await login(this.user);
         // console.log(values);
-        console.log(res);
+        // console.log(res);
+        this.$store.commit("setUser", res.data.data);
         //登录成功 提示用户
         Toast.success("登录成功");
+        this.$router.push("/");
       } catch (e) {
         // e >> 错误对象信息
         // if (e && e.response && e.response.data && e.response.data.message){
@@ -145,6 +152,9 @@ export default {
         // 不管成功或者失败都会执行的逻辑
         this.isDisabied = false;
       }
+    },
+    tiaozhuan() {
+      this.$router.push("/my");
     },
   },
 };

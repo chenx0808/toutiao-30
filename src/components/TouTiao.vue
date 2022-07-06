@@ -11,9 +11,9 @@ export default {
       type: String,
     },
   },
-  mounted() {
-    console.log(this.icon);
-  },
+  // mounted() {
+  //   console.log(this.icon);
+  // },
 };
 </script>
 

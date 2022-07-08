@@ -1,4 +1,5 @@
 export function getLocal(key) {
+  console.log(key);
   let data = localStorage.getItem(key);
 
   try {

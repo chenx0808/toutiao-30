@@ -9,6 +9,7 @@ export default new Vuex.Store({
   state: {
     user: getLocal(tokenkey),
   },
+
   getters: {},
   // 修改状态的唯一入口
   // 是允许有同步状态

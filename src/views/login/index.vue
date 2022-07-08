@@ -139,7 +139,7 @@ export default {
         this.isDisabied = true;
 
         await this.$refs.form.validate("mobile");
-        console.log("正在发送验证码");
+        // console.log("正在发送验证码");
         //button 合适的时机添加disabied
         await getSmsCode(this.user.mobile);
         //展示倒计时

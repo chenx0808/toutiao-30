@@ -14,6 +14,9 @@ import Vant from "vant";
 import "vant/lib/index.less";
 Vue.use(Vant);
 
+//注册时间样式
+import "@/utils/day";
+
 //测试下接口是否能用
 // import request from "./utils/request";
 // request.get("/v1_0/channels").then((res) => {

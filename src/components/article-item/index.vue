@@ -1,5 +1,6 @@
 <template>
   <div class="article-item">
+    <meta name="referrer" content="no-referrer" />
     <van-cell :title="article.title">
       <template #default v-if="article.cover.type === 1">
         <van-image class="img" :src="article.cover.images[0]"></van-image>
@@ -18,7 +19,7 @@
         <div class="label-container">
           <span>{{ article.aut_name }}</span>
           <span>评论{{ article.comm_count }}</span>
-          <span>{{ article.pubdate }}</span>
+          <span>{{ article.pubdate | relativeTime }}</span>
         </div>
       </template>
     </van-cell>

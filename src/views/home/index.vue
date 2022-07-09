@@ -26,25 +26,43 @@
       <van-tab title="标签 4">内容 4</van-tab> -->
       <template #nav-right>
         <div class="placeholder"></div>
-        <div class="hamburger-btn">
+        <div class="hamburger-btn" @click="show = true">
           <TouTiao icon="gengduo" />
         </div>
       </template>
     </van-tabs>
+
+    <!--弹出层 -->
+    <van-popup
+      v-model="show"
+      style="height: 80%"
+      position="bottom"
+      closeable
+      close-icon-position="top-left"
+    >
+      <!-- <van-cell style="text-align: center" title="频道编辑"></van-cell> -->
+      <ChannelEdit
+        :userChannels="userChannels"
+        :active="active"
+        @update-active="onUpdateActive"
+      ></ChannelEdit>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import { getUserChannels } from "@/api/channel";
 import ArticleList from "./components/article-list.vue";
+import ChannelEdit from "./components/channel-edit.vue";
 export default {
   name: "HomePage",
-  components: { ArticleList },
+  components: { ArticleList, ChannelEdit },
   props: {},
   data() {
     return {
-      active: 2,
+      active: 0,
       userChannels: [],
+      show: false,
     };
   },
   computed: {},
@@ -58,6 +76,10 @@ export default {
       const res = await getUserChannels();
       // console.log(res);
       this.userChannels = res.data.data.channels;
+    },
+    onUpdateActive(index, status) {
+      this.active = index;
+      this.show = status;
     },
   },
 };

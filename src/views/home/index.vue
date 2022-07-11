@@ -9,6 +9,7 @@
           size="small"
           type="info"
           round
+          to="/search"
           >搜索</van-button
         >
       </template>
@@ -52,8 +53,10 @@
 
 <script>
 import { getUserChannels } from "@/api/channel";
+import { USERCHANNELKEY } from "@/constants";
 import ArticleList from "./components/article-list.vue";
 import ChannelEdit from "./components/channel-edit.vue";
+import { getLocal } from "@/utils/storage";
 export default {
   name: "HomePage",
   components: { ArticleList, ChannelEdit },
@@ -73,9 +76,21 @@ export default {
   mounted() {},
   methods: {
     async handleGetUserChannel() {
-      const res = await getUserChannels();
-      // console.log(res);
-      this.userChannels = res.data.data.channels;
+      // const res = await getUserChannels();
+      // // console.log(res);
+      // this.userChannels = res.data.data.channels;
+      try {
+        const token = this.$store.state.user?.token;
+        let channels = getLocal(USERCHANNELKEY);
+        if (token || !channels) {
+          const res = await getUserChannels();
+          channels = res.data.data.channels;
+        }
+        this.userChannels = channels;
+      } catch (e) {
+        console.log(e);
+        this.$toast("获取数据失败");
+      }
     },
     onUpdateActive(index, status) {
       this.active = index;

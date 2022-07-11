@@ -50,9 +50,16 @@
 </template>
 
 <script>
-import { fethAllChannels } from "@/api/channel";
+import {
+  fethAllChannels,
+  fethAddChannels,
+  deleteUserChannel,
+} from "@/api/channel";
 import differenceBy from "lodash/differenceBy";
+import { mapState } from "vuex";
 import { Notify } from "vant";
+import { setLocal } from "@/utils/storage";
+import { USERCHANNELKEY } from "@/constants";
 export default {
   name: "ChannelEdit",
   components: {},
@@ -79,6 +86,7 @@ export default {
 
       return differenceBy(this.allChannel, this.userChannels, "id");
     },
+    ...mapState(["user"]),
   },
   watch: {},
   created() {
@@ -91,18 +99,44 @@ export default {
       // console.log(res);
       this.allChannel = res.data.data.channels;
     },
-    addchannel(value) {
-      this.userChannels.push(value);
+    async addchannel(channel) {
+      this.userChannels.push(channel);
+      if (this.user) {
+        // console.log(2);
+        try {
+          await fethAddChannels({
+            id: channel.id,
+            seq: this.userChannels.length,
+          });
+          this.$toast("添加成功");
+        } catch (e) {
+          this.$toast("添加失败");
+        }
+      } else {
+        setLocal(USERCHANNELKEY, this.userChannels);
+      }
+    },
+    async deleteChannel(value) {
+      try {
+        if (this.user) {
+          await deleteUserChannel(value.id);
+        } else {
+          setLocal(USERCHANNELKEY, this.userChannels);
+        }
+        this.$toast("删除成功");
+      } catch (e) {
+        this.$toast("删除失败");
+      }
     },
     onMyChannelClick(value, index) {
       console.log(value, index);
       if (this.isEdit) {
-        if (this.active === 0)
-          return Notify({ type: "danger", message: "不能删" });
+        if (index === 0) return Notify({ type: "danger", message: "不能删" });
         if (index <= this.active) {
           this.$emit("update-active", this.active - 1, true);
         }
         this.userChannels.splice(index, 1);
+        this.deleteChannel(value);
       } else {
         // 处于非编辑
         this.$emit("update-active", index, false);

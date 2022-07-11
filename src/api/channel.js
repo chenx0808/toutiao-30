@@ -14,3 +14,19 @@ export const fethAllChannels = () => {
     url: "/v1_0/channels",
   });
 };
+
+export const fethAddChannels = (channle) => {
+  return request({
+    method: "PATCH",
+    url: "/v1_0/user/channels",
+    data: {
+      channels: [channle],
+    },
+  });
+};
+export const deleteUserChannel = (channleId) => {
+  return request({
+    method: "DELETE",
+    url: `/v1_0/user/channels/${channleId}`,
+  });
+};

@@ -1,7 +1,7 @@
 <template>
   <div class="article-item">
     <meta name="referrer" content="no-referrer" />
-    <van-cell :title="article.title">
+    <van-cell :title="article.title" :to="`/art/${article.art_id}`">
       <template #default v-if="article.cover.type === 1">
         <van-image class="img" :src="article.cover.images[0]"></van-image>
       </template>

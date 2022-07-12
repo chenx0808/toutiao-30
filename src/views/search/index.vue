@@ -12,7 +12,7 @@
     </form>
 
     <!-- 搜索结果页 -->
-    <SearchResult v-if="isShowResult" />
+    <SearchResult v-if="isShowResult" :searchText="searchText" />
 
     <!-- 搜索建议列表组件 -->
     <SearchSuggestion
@@ -22,7 +22,12 @@
     />
 
     <!-- 搜索历史组件 -->
-    <SearchHistory v-else />
+    <SearchHistory
+      v-else
+      :SearchHistories="SearchHistories"
+      @onSearch="onSearch"
+      @deleteAll="deleteAll"
+    />
   </div>
 </template>
 
@@ -30,6 +35,9 @@
 import SearchHistory from "./components/search-history.vue";
 import SearchSuggestion from "./components/search-suggestion.vue";
 import SearchResult from "./components/search-result.vue";
+import { setLocal } from "@/utils/storage";
+import { HISTORYKEY } from "@/constants";
+import { getLocal } from "@/utils/storage";
 export default {
   name: "SearchPage",
   components: { SearchHistory, SearchSuggestion, SearchResult },
@@ -38,10 +46,15 @@ export default {
     return {
       searchText: "",
       isShowResult: false, //是否展示搜索结果页面
+      SearchHistories: getLocal(HISTORYKEY) || [], //搜索历史列表
     };
   },
   computed: {},
-  watch: {},
+  watch: {
+    SearchHistories(val) {
+      setLocal(HISTORYKEY, val);
+    },
+  },
   created() {},
   methods: {
     onSearch(value) {
@@ -49,12 +62,25 @@ export default {
       // 默认-->搜索历史
       // 输入框有值-->搜索内容
       // 按下回车-->搜索结果
-      console.log("开始搜索");
+      // console.log("开始搜索");
       this.isShowResult = true;
+      // 搜索结果页面展示
       this.searchText = value;
+      // 添加之前  先判断value是否已经在搜索历史列表里面
+      const index = this.SearchHistories.indexOf(value);
+      // console.log(index);
+      if (index !== -1) {
+        // 找到的这项删除
+        this.SearchHistories.splice(index, 1);
+      }
+      this.SearchHistories.unshift(value);
     },
     onCancel() {
       console.log("点击了取消");
+      this.$router.push("/home");
+    },
+    deleteAll() {
+      this.SearchHistories = [];
     },
   },
 };

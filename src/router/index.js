@@ -48,6 +48,12 @@ const routes = [
     path: "/search",
     component: () => import("@/views/search"),
   },
+  {
+    path: "/art/:articleId",
+    component: () => import("@/views/article/index.vue"),
+    // 将路由动态参数映射到组件的 props 中，更推荐这种做法
+    props: true,
+  },
 ];
 
 const router = new VueRouter({

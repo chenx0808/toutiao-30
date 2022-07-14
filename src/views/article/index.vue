@@ -30,25 +30,10 @@
           <div slot="label" class="publish-date">
             {{ article.pubdate | relativeTime }}
           </div>
-          <van-button
-            v-if="!article.is_followed"
-            class="follow-btn"
-            type="info"
-            color="#3296fa"
-            round
-            size="small"
-            icon="plus"
-            @click="follow"
-            >关注</van-button
-          >
-          <van-button
-            @click="follow"
-            v-else
-            class="follow-btn"
-            round
-            size="small"
-            >已关注</van-button
-          >
+          <FollowUser
+            :artId="article.aut_id"
+            v-model="article.is_followed"
+          ></FollowUser>
         </van-cell>
         <!-- /用户信息 -->
 
@@ -59,6 +44,9 @@
           ref="countent"
         ></div>
         <van-divider>正文结束</van-divider>
+        <!-- 评论组件 -->
+        <CommentList :source="article.art_id" />
+        <!-- 评论组件 -->
       </div>
       <!-- /加载完成-文章详情 -->
 
@@ -80,15 +68,25 @@
 
     <!-- 底部区域 -->
     <div class="article-bottom">
-      <van-button class="comment-btn" type="default" round size="small"
+      <van-button
+        @click="isPostShow = true"
+        class="comment-btn"
+        type="default"
+        round
+        size="small"
         >写评论</van-button
       >
       <van-icon name="comment-o" :badge="article.comm_count" color="#777" />
-      <van-icon color="#777" name="star-o" />
-      <van-icon color="#777" name="good-job-o" />
+      <!-- <van-icon color="#777" name="star-o" /> -->
+      <CollectArticle :artId="article.art_id" v-model="article.is_collected" />
+      <!-- <van-icon color="#777" name="good-job-o" /> -->
+      <LikeUser :artId="article.art_id" v-model="article.attitude" />
       <van-icon name="share" color="#777777"></van-icon>
     </div>
     <!-- /底部区域 -->
+    <van-popup v-model="isPostShow" position="bottom">
+      <CommentPost :target="article.art_id" />
+    </van-popup>
   </div>
 </template>
 
@@ -96,10 +94,21 @@
 import { getArticleById } from "@/api/article";
 import "github-markdown-css";
 import { ImagePreview } from "vant";
-import { addFollow, deleteFollow } from "@/api/user";
+import FollowUser from "./components/follow-user/index.vue";
+import CollectArticle from "./components/collect-article/index.vue";
+import LikeUser from "./components/like-user/index.vue";
+import CommentList from "./components/comment-list.vue";
+import CommentPost from "./components/comment-post.vue";
+
 export default {
   name: "ArticleIndex",
-  components: {},
+  components: {
+    FollowUser,
+    CollectArticle,
+    LikeUser,
+    CommentList,
+    CommentPost,
+  },
   props: {
     articleId: {
       type: [Number, String],
@@ -111,6 +120,7 @@ export default {
       article: {},
       loading: false,
       isNotFound: false,
+      isPostShow: false,
     };
   },
   computed: {},
@@ -121,9 +131,9 @@ export default {
   mounted() {},
   methods: {
     previewImg() {
-      console.log(this.$refs.countent);
+      // console.log(this.$refs.countent);
       const imgs = this.$refs.countent.querySelectorAll("img");
-      console.log(imgs);
+      // console.log(imgs);
       //获取图片链接
       const images = [];
       //遍历dom结构获取图片链接，存入数组
@@ -136,7 +146,7 @@ export default {
           });
         });
       });
-      console.log(images);
+      // console.log(images);
     },
     async getArticleDetail() {
       this.loading = true;
@@ -149,32 +159,9 @@ export default {
           this.previewImg();
         });
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         this.loading = false;
         this.isNotFound = e.response.status === 404;
-      }
-    },
-    async follow() {
-      try {
-        if (this.article.is_followed) {
-          // 取消关注
-          await deleteFollow(this.article.aut_id);
-        } else {
-          // 去关注
-          await addFollow(this.article.aut_id);
-        }
-        this.article.is_followed = !this.article.is_followed;
-        // 关注之后进行提示
-        this.$notify({
-          type: "success",
-          message: this.article.is_followed ? "关注成功" : "取消关注",
-        });
-      } catch (e) {
-        console.log(e);
-        this.$notify({
-          type: "danger",
-          message: "操作失败",
-        });
       }
     },
   },
